@@ -31,6 +31,16 @@ module.exports = function (grunt) {
       dist : 'dist'
     },
 
+    env : {
+      test : {
+        NODE_ENV : 'test'
+      },
+      prod : {
+        NODE_ENV : 'production'
+      },
+      all : localConfig
+    },
+
     // javascript linting
     eslint : {
       options : {
@@ -80,6 +90,60 @@ module.exports = function (grunt) {
         }]
       }
     },
+
+    // serverside testing
+    mochaTest : {
+      options : {
+        reporter : 'spec'
+      },
+      src : ['server/**/*.spec.js']
+    }
   });
+
+  //
+  // :: Manual task declarations
+  //
+
+  // Use to delay livereload until after the server has restarted
+  grunt.registerTask('wait', function () {
+    grunt.log.ok('Waiting for server reload...');
+
+    // timeouts are a bitch
+    var done = this.async();
+    setTimeout(function () {
+      grunt.log.writeln('Done waiting!');
+      done();
+    }, 1500);
+  });
+
+  // Keep the express instance alive
+  grunt.registerTask('express-keepalive', function () {
+    this.async();
+  });
+
+  // Run tests
+  grunt.registerTask('test', function (target) {
+
+    if (target === 'server') {
+      grunt.task.run([
+        'env:all',
+        'env:test',
+        'eslint:server',
+        'mochaTest'
+      ]);
+    }
+    // TODO other environments (if ever)
+    else {
+      grunt.task.run([
+        'test:server'
+      ]);
+    }
+  });
+
+  // build for production
+  grunt.registerTask('build', [
+    'clean:dist',
+    'copy:dist'
+  ]);
 
 };
