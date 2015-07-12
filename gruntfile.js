@@ -27,19 +27,59 @@ module.exports = function (grunt) {
     // project settings
     pkg : grunt.file.readJSON('package.json'),
 
+    paths : {
+      dist : 'dist'
+    },
+
     // javascript linting
     eslint : {
       options : {
         config : 'server/.eslintrc'
       },
       server : {
+        options : {},
         src : [
           'server/**/*.js',
           '!server/**/*.{spec,mock}.js'
         ]
+      },
+      servertests : {
+        options : {},
+        src : [
+          'server/**/*.{spec,mock}.js'
+        ]
       }
-    }
+    },
 
+    // clean build and temp folders
+    clean : {
+      dist : {
+        files : [{
+          dot : true,
+          src : [
+            '.tmp',
+            '<%= paths.dist %>/*',
+            '!<%= paths.dist %>/.git'
+          ]
+        }]
+      },
+      server : '.tmp'
+    },
+
+    // copy files required by build to places
+    // exposed to the build process
+    copy: {
+      dist: {
+        files: [{
+          expand: true,
+          dest: '<%= paths.dist %>',
+          src: [
+            'package.json',
+            'server/**/*'
+          ]
+        }]
+      }
+    },
   });
 
 };
