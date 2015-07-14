@@ -3,5 +3,5 @@
 //
 // :: loads Babel
 // :: invokes primary app module
-require('babel-core');
+require('babel/register');
 require('./app');
