@@ -91,12 +91,44 @@ module.exports = function (grunt) {
       }
     },
 
+    // web server management
+    express : {
+      options : {
+        port : process.env.PORT || 8080
+      },
+      dev : {
+        options : {
+          script : 'server/index.js',
+          debug : true
+        }
+      },
+      prod : {
+        options : {
+          script : 'dist/server/index.js'
+        }
+      }
+    },
+
     // serverside testing
     mochaTest : {
       options : {
         reporter : 'spec'
       },
       src : ['server/**/*.spec.js']
+    },
+
+    // watches
+    watch : {
+      express : {
+        files : [
+          'server/**/*.{js,json,es6}'
+        ],
+        tasks : ['express:dev','wait'],
+        options : {
+          livereload : true,
+          nospawn : true
+        }
+      }
     }
   });
 
@@ -119,6 +151,32 @@ module.exports = function (grunt) {
   // Keep the express instance alive
   grunt.registerTask('express-keepalive', function () {
     this.async();
+  });
+
+  // start up the web server
+  grunt.registerTask('serve', function (target) {
+
+    // :: prod
+    if (target === 'dist') {
+      return grunt.task.run([
+        'build',
+        'env:all',
+        'env:prod',
+        'express:prod',
+        'wait',
+        'express-keepalive'
+      ]);
+    }
+
+    // :: dev
+    grunt.task.run([
+      'clean:server',
+      'env:all',
+      'express:dev',
+      'wait',
+      'watch'
+    ]);
+
   });
 
   // Run tests
