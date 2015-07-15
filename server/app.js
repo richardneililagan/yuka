@@ -20,6 +20,8 @@ import expressconfig from './config/express';
 expressconfig(app);
 
 // :: TODO routes
+import routeconfig from './routes';
+routeconfig(app);
 
 server.listen(8080, '127.0.0.1', () => {
   console.log('Express server listening on %d, in %s mode', config.port, app.get('env'));
